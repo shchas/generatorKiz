@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import pylibdmtx.pylibdmtx as dmtx
 from PIL import Image, ImageTk
+import fitz  # PyMuPDF for PDF processing
 
 
 def update_line_numbers():
@@ -92,18 +93,28 @@ def clear_input():
     current_image_index = 0
 
 
-def load_image():
-    file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp")])
+def load_file():
+    file_path = filedialog.askopenfilename(filetypes=[("Supported Files", "*.png;*.jpg;*.jpeg;*.bmp;*.pdf")])
     if not file_path:
         return
 
-    img = Image.open(file_path)
-    decoded = dmtx.decode(img)
-    if decoded:
-        text_input.insert(tk.END, decoded[0].data.decode("utf-8") + "\n")
-        update_line_numbers()
+    if file_path.lower().endswith(".pdf"):
+        doc = fitz.open(file_path)
+        for page in doc:
+            pix = page.get_pixmap()
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            decoded = dmtx.decode(img)
+            if decoded:
+                text_input.insert(tk.END, decoded[0].data.decode("utf-8") + "\n")
+                update_line_numbers()
     else:
-        messagebox.showwarning("Ошибка", "Не удалось распознать DataMatrix код")
+        img = Image.open(file_path)
+        decoded = dmtx.decode(img)
+        if decoded:
+            text_input.insert(tk.END, decoded[0].data.decode("utf-8") + "\n")
+            update_line_numbers()
+        else:
+            messagebox.showwarning("Ошибка", "Не удалось распознать DataMatrix код")
 
 
 root = tk.Tk()
@@ -126,20 +137,20 @@ buttons_frame.pack(pady=5)
 
 button_style = {"bg": "#A9D08E", "font": ("Calibri", 12), "relief": "flat", "bd": 5, "highlightthickness": 0}
 
-btn_generate = tk.Button(buttons_frame, text="Сгенерировать", command=generate_codes, **button_style)
-btn_generate.grid(row=0, column=0, padx=5, pady=5)
-
-btn_load = tk.Button(buttons_frame, text="Загрузить изображение", command=load_image, **button_style)
-btn_load.grid(row=0, column=1, padx=5, pady=5)
-
 btn_truncate = tk.Button(buttons_frame, text="Обрезать до 31 символа", command=truncate_codes, **button_style)
-btn_truncate.grid(row=0, column=2, padx=5, pady=5)
+btn_truncate.grid(row=0, column=0, padx=5, pady=5)
+
+btn_generate = tk.Button(buttons_frame, text="Сгенерировать", command=generate_codes, **button_style)
+btn_generate.grid(row=0, column=1, padx=5, pady=5)
 
 btn_save = tk.Button(buttons_frame, text="Сохранить", command=save_images, **button_style)
-btn_save.grid(row=0, column=3, padx=5, pady=5)
+btn_save.grid(row=0, column=2, padx=5, pady=5)
 
 btn_clear = tk.Button(buttons_frame, text="Очистить", command=clear_input, **button_style)
-btn_clear.grid(row=0, column=4, padx=5, pady=5)
+btn_clear.grid(row=0, column=3, padx=5, pady=5)
+
+btn_load = tk.Button(buttons_frame, text="Загрузить файл", command=load_file, **button_style)
+btn_load.grid(row=0, column=4, padx=5, pady=5)
 
 images_frame = tk.Frame(root, bg="#DDEBF7")
 images_frame.pack(pady=10)
