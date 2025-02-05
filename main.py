@@ -1,8 +1,8 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 import pylibdmtx.pylibdmtx as dmtx
 from PIL import Image, ImageTk
-import fitz  # PyMuPDF for PDF processing
+import pymupdf  # Используем pymupdf вместо fitz
 
 
 def update_line_numbers():
@@ -98,15 +98,21 @@ def load_file():
     if not file_path:
         return
 
+    progress_bar.start()
+    root.update()
+
     if file_path.lower().endswith(".pdf"):
-        doc = fitz.open(file_path)
-        for page in doc:
+        doc = pymupdf.open(file_path)  # Используем pymupdf вместо fitz
+        total_pages = len(doc)
+        for i, page in enumerate(doc):
             pix = page.get_pixmap()
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
             decoded = dmtx.decode(img)
             if decoded:
                 text_input.insert(tk.END, decoded[0].data.decode("utf-8") + "\n")
                 update_line_numbers()
+            progress_bar['value'] = ((i + 1) / total_pages) * 100
+            root.update()
     else:
         img = Image.open(file_path)
         decoded = dmtx.decode(img)
@@ -116,10 +122,14 @@ def load_file():
         else:
             messagebox.showwarning("Ошибка", "Не удалось распознать DataMatrix код")
 
+    progress_bar.stop()
+    progress_bar['value'] = 0
+    root.update()
+
 
 root = tk.Tk()
 root.title("Генератор DataMatrix")
-root.geometry("600x500")
+root.geometry("600x550")
 root.configure(bg="#DDEBF7")
 
 text_frame = tk.Frame(root, bg="#DDEBF7")
@@ -134,6 +144,9 @@ text_input.bind("<KeyRelease>", lambda event: update_line_numbers())
 
 buttons_frame = tk.Frame(root, bg="#DDEBF7")
 buttons_frame.pack(pady=5)
+
+progress_bar = ttk.Progressbar(root, orient="horizontal", length=400, mode='determinate')
+progress_bar.pack(pady=5)
 
 button_style = {"bg": "#A9D08E", "font": ("Calibri", 12), "relief": "flat", "bd": 5, "highlightthickness": 0}
 
