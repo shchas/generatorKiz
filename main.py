@@ -124,23 +124,22 @@ text_input.bind("<KeyRelease>", lambda event: update_line_numbers())
 buttons_frame = tk.Frame(root, bg="#DDEBF7")
 buttons_frame.pack(pady=5)
 
-btn_truncate = tk.Button(buttons_frame, text="Обрезать до 31 символа", command=truncate_codes, bg="#A9D08E",
-                         font=("Calibri", 12))
-btn_truncate.grid(row=0, column=0, padx=5)
+button_style = {"bg": "#A9D08E", "font": ("Calibri", 12), "relief": "flat", "bd": 5, "highlightthickness": 0}
 
-btn_generate = tk.Button(buttons_frame, text="Сгенерировать", command=generate_codes, bg="#A9D08E",
-                         font=("Calibri", 12))
-btn_generate.grid(row=0, column=1, padx=5)
+btn_generate = tk.Button(buttons_frame, text="Сгенерировать", command=generate_codes, **button_style)
+btn_generate.grid(row=0, column=0, padx=5, pady=5)
 
-btn_save = tk.Button(buttons_frame, text="Сохранить", command=save_images, bg="#A9D08E", font=("Calibri", 12))
-btn_save.grid(row=0, column=2, padx=5)
+btn_load = tk.Button(buttons_frame, text="Загрузить изображение", command=load_image, **button_style)
+btn_load.grid(row=0, column=1, padx=5, pady=5)
 
-btn_clear = tk.Button(buttons_frame, text="Очистить", command=clear_input, bg="#A9D08E", font=("Calibri", 12))
-btn_clear.grid(row=0, column=3, padx=5)
+btn_truncate = tk.Button(buttons_frame, text="Обрезать до 31 символа", command=truncate_codes, **button_style)
+btn_truncate.grid(row=0, column=2, padx=5, pady=5)
 
-btn_load = tk.Button(buttons_frame, text="Загрузить изображение", command=load_image, bg="#A9D08E",
-                     font=("Calibri", 12))
-btn_load.grid(row=0, column=4, padx=5)
+btn_save = tk.Button(buttons_frame, text="Сохранить", command=save_images, **button_style)
+btn_save.grid(row=0, column=3, padx=5, pady=5)
+
+btn_clear = tk.Button(buttons_frame, text="Очистить", command=clear_input, **button_style)
+btn_clear.grid(row=0, column=4, padx=5, pady=5)
 
 images_frame = tk.Frame(root, bg="#DDEBF7")
 images_frame.pack(pady=10)
@@ -148,10 +147,10 @@ images_frame.pack(pady=10)
 nav_buttons_frame = tk.Frame(root, bg="#DDEBF7")
 nav_buttons_frame.pack()
 
-btn_prev = tk.Button(nav_buttons_frame, text="⬅", command=prev_image, bg="#B4C6E7", font=("Calibri", 12))
-btn_prev.pack(side=tk.LEFT, padx=10)
-btn_next = tk.Button(nav_buttons_frame, text="➡", command=next_image, bg="#B4C6E7", font=("Calibri", 12))
-btn_next.pack(side=tk.RIGHT, padx=10)
+btn_prev = tk.Button(nav_buttons_frame, text="⬅", command=prev_image, **button_style)
+btn_prev.pack(side=tk.LEFT, padx=10, pady=5)
+btn_next = tk.Button(nav_buttons_frame, text="➡", command=next_image, **button_style)
+btn_next.pack(side=tk.RIGHT, padx=10, pady=5)
 
 images = []
 current_image_index = 0
