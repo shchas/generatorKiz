@@ -92,6 +92,20 @@ def clear_input():
     current_image_index = 0
 
 
+def load_image():
+    file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp")])
+    if not file_path:
+        return
+
+    img = Image.open(file_path)
+    decoded = dmtx.decode(img)
+    if decoded:
+        text_input.insert(tk.END, decoded[0].data.decode("utf-8") + "\n")
+        update_line_numbers()
+    else:
+        messagebox.showwarning("Ошибка", "Не удалось распознать DataMatrix код")
+
+
 root = tk.Tk()
 root.title("Генератор DataMatrix")
 root.geometry("500x500")
@@ -120,6 +134,9 @@ btn_save.grid(row=0, column=2, padx=5)
 
 btn_clear = tk.Button(buttons_frame, text="Очистить", command=clear_input)
 btn_clear.grid(row=0, column=3, padx=5)
+
+btn_load = tk.Button(buttons_frame, text="Загрузить изображение", command=load_image)
+btn_load.grid(row=0, column=4, padx=5)
 
 images_frame = tk.Frame(root)
 images_frame.pack(pady=10)
