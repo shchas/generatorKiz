@@ -45,10 +45,10 @@ def display_image():
         idx, code, img = images[current_image_index]
         img = img.resize((100, 100), Image.Resampling.LANCZOS)
         img_tk = ImageTk.PhotoImage(img)
-        lbl = tk.Label(images_frame, image=img_tk)
+        lbl = tk.Label(images_frame, image=img_tk, bg="#DDEBF7")
         lbl.image = img_tk
         lbl.pack()
-        lbl_text = tk.Label(images_frame, text=f"Строка {idx}")
+        lbl_text = tk.Label(images_frame, text=f"Строка {idx}", bg="#DDEBF7", font=("Calibri", 12))
         lbl_text.pack()
 
 
@@ -108,45 +108,49 @@ def load_image():
 
 root = tk.Tk()
 root.title("Генератор DataMatrix")
-root.geometry("500x500")
+root.geometry("600x500")
+root.configure(bg="#DDEBF7")
 
-text_frame = tk.Frame(root)
+text_frame = tk.Frame(root, bg="#DDEBF7")
 text_frame.pack(pady=10, fill=tk.BOTH, expand=True)
 
-line_numbers = tk.Text(text_frame, width=3, state=tk.NORMAL, wrap="none")
+line_numbers = tk.Text(text_frame, width=3, state=tk.NORMAL, wrap="none", bg="#B4C6E7", font=("Calibri", 12))
 line_numbers.pack(side=tk.LEFT, fill=tk.Y)
 
-text_input = tk.Text(text_frame, height=5)
+text_input = tk.Text(text_frame, height=5, font=("Calibri", 12))
 text_input.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 text_input.bind("<KeyRelease>", lambda event: update_line_numbers())
 
-buttons_frame = tk.Frame(root)
+buttons_frame = tk.Frame(root, bg="#DDEBF7")
 buttons_frame.pack(pady=5)
 
-btn_truncate = tk.Button(buttons_frame, text="Обрезать до 31 символа", command=truncate_codes)
+btn_truncate = tk.Button(buttons_frame, text="Обрезать до 31 символа", command=truncate_codes, bg="#A9D08E",
+                         font=("Calibri", 12))
 btn_truncate.grid(row=0, column=0, padx=5)
 
-btn_generate = tk.Button(buttons_frame, text="Сгенерировать", command=generate_codes)
+btn_generate = tk.Button(buttons_frame, text="Сгенерировать", command=generate_codes, bg="#A9D08E",
+                         font=("Calibri", 12))
 btn_generate.grid(row=0, column=1, padx=5)
 
-btn_save = tk.Button(buttons_frame, text="Сохранить", command=save_images)
+btn_save = tk.Button(buttons_frame, text="Сохранить", command=save_images, bg="#A9D08E", font=("Calibri", 12))
 btn_save.grid(row=0, column=2, padx=5)
 
-btn_clear = tk.Button(buttons_frame, text="Очистить", command=clear_input)
+btn_clear = tk.Button(buttons_frame, text="Очистить", command=clear_input, bg="#A9D08E", font=("Calibri", 12))
 btn_clear.grid(row=0, column=3, padx=5)
 
-btn_load = tk.Button(buttons_frame, text="Загрузить изображение", command=load_image)
+btn_load = tk.Button(buttons_frame, text="Загрузить изображение", command=load_image, bg="#A9D08E",
+                     font=("Calibri", 12))
 btn_load.grid(row=0, column=4, padx=5)
 
-images_frame = tk.Frame(root)
+images_frame = tk.Frame(root, bg="#DDEBF7")
 images_frame.pack(pady=10)
 
-nav_buttons_frame = tk.Frame(root)
+nav_buttons_frame = tk.Frame(root, bg="#DDEBF7")
 nav_buttons_frame.pack()
 
-btn_prev = tk.Button(nav_buttons_frame, text="⬅", command=prev_image)
+btn_prev = tk.Button(nav_buttons_frame, text="⬅", command=prev_image, bg="#B4C6E7", font=("Calibri", 12))
 btn_prev.pack(side=tk.LEFT, padx=10)
-btn_next = tk.Button(nav_buttons_frame, text="➡", command=next_image)
+btn_next = tk.Button(nav_buttons_frame, text="➡", command=next_image, bg="#B4C6E7", font=("Calibri", 12))
 btn_next.pack(side=tk.RIGHT, padx=10)
 
 images = []
