@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import pylibdmtx.pylibdmtx as dmtx
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageEnhance
 import pymupdf  # Используем pymupdf вместо fitz
 
 
@@ -10,6 +10,16 @@ def update_line_numbers():
     lines = text_input.get("1.0", tk.END).split("\n")
     for i in range(1, len(lines) + 1):
         line_numbers.insert(tk.END, f"{i}\n")
+
+
+def enable_paste(event=None):
+    """Разрешает вставку текста в поле ввода"""
+    text_input.event_generate("<<Paste>>")
+
+
+def enable_copy(event=None):
+    """Разрешает копирование текста из поля ввода"""
+    text_input.event_generate("<<Copy>>")
 
 
 def generate_codes():
@@ -102,23 +112,27 @@ def load_file():
     root.update()
 
     if file_path.lower().endswith(".pdf"):
-        doc = pymupdf.open(file_path)  # Используем pymupdf вместо fitz
+        doc = pymupdf.open(file_path)
         total_pages = len(doc)
         for i, page in enumerate(doc):
             pix = page.get_pixmap()
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
             decoded = dmtx.decode(img)
             if decoded:
-                text_input.insert(tk.END, decoded[0].data.decode("utf-8") + "\n")
-                update_line_numbers()
+                for code in decoded:
+                    text_input.insert(tk.END, code.data.decode("utf-8") + "\n")
+                    update_line_numbers()
+            else:
+                messagebox.showwarning("Ошибка", f"На странице {i + 1} не найден DataMatrix код")
             progress_bar['value'] = ((i + 1) / total_pages) * 100
             root.update()
     else:
         img = Image.open(file_path)
         decoded = dmtx.decode(img)
         if decoded:
-            text_input.insert(tk.END, decoded[0].data.decode("utf-8") + "\n")
-            update_line_numbers()
+            for code in decoded:
+                text_input.insert(tk.END, code.data.decode("utf-8") + "\n")
+                update_line_numbers()
         else:
             messagebox.showwarning("Ошибка", "Не удалось распознать DataMatrix код")
 
@@ -141,6 +155,13 @@ line_numbers.pack(side=tk.LEFT, fill=tk.Y)
 text_input = tk.Text(text_frame, height=5, font=("Calibri", 12))
 text_input.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 text_input.bind("<KeyRelease>", lambda event: update_line_numbers())
+text_input.bind("<Control-v>", enable_paste)
+text_input.bind("<Shift-Insert>", enable_paste)
+text_input.bind("<Control-c>", enable_copy)
+text_input.bind("<Control-Insert>", enable_copy)
+
+images_frame = tk.Frame(root, bg="#DDEBF7")
+images_frame.pack(pady=10)
 
 buttons_frame = tk.Frame(root, bg="#DDEBF7")
 buttons_frame.pack(pady=5)
