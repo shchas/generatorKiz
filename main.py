@@ -102,6 +102,13 @@ def clear_input():
     images = []
     current_image_index = 0
 
+def preprocess_image(img):
+    """Увеличение контраста и масштабирование для лучшего распознавания"""
+    enhancer = ImageEnhance.Contrast(img)
+    img = enhancer.enhance(2.0)  # Повышаем контраст
+    img = img.convert('L')  # Переводим в черно-белый
+    img = img.resize((img.width * 2, img.height * 2), Image.Resampling.LANCZOS)  # Увеличиваем размер
+    return img
 
 def load_file():
     file_path = filedialog.askopenfilename(filetypes=[("Supported Files", "*.png;*.jpg;*.jpeg;*.bmp;*.pdf")])
@@ -117,6 +124,7 @@ def load_file():
         for i, page in enumerate(doc):
             pix = page.get_pixmap()
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            img = preprocess_image(img)
             decoded = dmtx.decode(img)
             if decoded:
                 for code in decoded:
